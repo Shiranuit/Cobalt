@@ -1,12 +1,14 @@
 import 'dart:io';
 
+import 'dart:typed_data';
+
 class MultiPartPart {
   final String? name;
   final String? filename;
   final String? contentType;
   final String? contentDisposition;
   final bool isFile;
-  final List<int> content;
+  final Uint8List content;
 
   MultiPartPart({
     required this.content,
@@ -73,7 +75,9 @@ class MultiPartParser {
     int endHeaders = _parseHeaders(content, headers);
 
     return MultiPartPart(
-      content: content.sublist(endHeaders + 1, content.length - 1),
+      content: Uint8List.fromList(
+        content.sublist(endHeaders + 1, content.length - 1),
+      ),
       filename: headers['Content-Disposition']?.parameters['filename'],
       contentType: headers['Content-Type']?.value,
       contentDisposition: headers['Content-Disposition']?.value,
