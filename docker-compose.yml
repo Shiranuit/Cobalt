@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+
+  # backend:
+  #   build:
+  #     context: ./
+  #     dockerfile: ./backend/Dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-database}
+  #     DB_NAME: ${DB_NAME:-database}
+  #     DB_USER: ${DB_USER:-database}
+  #     DB_USER_PASSWORD: ${DB_USER_PASSWORD:-database}
+  #     JWT_SECRET: ${JWT_SECRET:-verysecurepassword}
+  #     DERIVATION_ROUND: ${DERIVATION_ROUND:-100000}
+  #     VAULT_SECRET: ${VAULT_SECRET:-verysecurepassword}
+  #   depends_on:
+  #     - postgres
+
+  postgres:
+    image: postgres:9.6
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cobalt}
+      DB_NAME: ${DB_NAME:-cobalt}
+      DB_USER: ${DB_USER:-cobalt}
+      DB_USER_PASSWORD: ${DB_USER_PASSWORD:-cobalt}
+    volumes:
+      - ./database/postgres-init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+      - ./database:/datamodel
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: always
+
+volumes:
+  pg_data:

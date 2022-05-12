@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:cobalt/annotations/backend_annotations.dart';
 import 'package:cobalt/core/service/backend_service.dart';
+import 'package:cobalt/storage/backend_storage.dart';
 
 import 'network/router_part.dart';
+import 'storage/service/postgres_storage_service.dart';
 import 'utils/reflect.dart';
 
 import 'package:cobalt/core/controller/backend_controller.dart';
@@ -23,16 +27,26 @@ class Backend extends EventEmitter with ErrorManagerMixin, ServiceManagerMixin {
   late final Entrypoint _entrypoint;
   final ErrorManager errorManager = ErrorManager();
   final Map<dynamic, BackendServiceMixin> _services = {};
+  late final IBackendStorageService storageService;
 
-  Backend() {
+  Backend({
+    IBackendStorageService? storageService,
+  }) {
     _router = Router(this);
     _entrypoint = Entrypoint(this, _router);
+    this.storageService = storageService ?? PostgresStorageService();
 
     loadErrorCodes(errorManager);
   }
 
   /// Start the backend, on the specified [port].
-  void start({int port = 8080}) async {
+  void start({
+    int port = 8080,
+    FutureOr<void> Function()? beforeListeningCallback,
+  }) async {
+    await storageService.init(this);
+
+    await beforeListeningCallback?.call();
     await _entrypoint.listen(port: port);
   }
 
@@ -137,14 +151,17 @@ class Backend extends EventEmitter with ErrorManagerMixin, ServiceManagerMixin {
   }
 
   /// Register a new instance of a service
+  @override
   void registerService<T extends BackendServiceMixin>(T service) {
     if (_services.containsKey(T)) {
       throw Exception('Service already registered');
     }
     _services[T] = service;
+    service.init(backend: this);
   }
 
   /// Access an instance of a service
+  @override
   T? getService<T extends BackendServiceMixin>() {
     BackendServiceMixin? service = _services[T];
     if (service == null) {
