@@ -142,6 +142,7 @@ class Backend extends EventEmitter with ErrorManagerMixin, ServiceManagerMixin {
       throw Exception('Service already registered');
     }
     _services[T] = service;
+    service.init(backend: this);
   }
 
   /// Access an instance of a service
