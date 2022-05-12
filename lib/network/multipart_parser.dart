@@ -1,4 +1,24 @@
-class MultiPartPart {}
+import 'dart:io';
+
+class MultiPartPart {
+  final String? name;
+  final String? filename;
+  final String? contentType;
+  final String? contentDisposition;
+  final bool isFile;
+  final List<int> content;
+
+  MultiPartPart({
+    required this.content,
+    this.name,
+    this.filename,
+    this.contentType,
+    this.contentDisposition,
+    this.isFile = false,
+  });
+
+  String contentAsString() => String.fromCharCodes(content);
+}
 
 class MultiPartParser {
   static int find(List<int> boundary, int start, List<int> content) {
@@ -18,8 +38,48 @@ class MultiPartParser {
     return -1;
   }
 
+  static int _parseHeaders(
+      List<int> content, Map<String, HeaderValue> headers) {
+    int colonChar = ':'.codeUnitAt(0);
+    int newlineChar = '\n'.codeUnitAt(0);
+    int index = 0;
+    while (index < content.length) {
+      int start = index;
+      String key = '';
+      while (index < content.length && content[index] != colonChar) {
+        if (content[index] == newlineChar) {
+          return index;
+        }
+        index++;
+      }
+      if (index >= content.length) {
+        return -1;
+      }
+      key = String.fromCharCodes(content.sublist(start, index));
+      int startValue = ++index;
+      while (index < content.length && content[index] != newlineChar) {
+        index++;
+      }
+      String value =
+          String.fromCharCodes(content.sublist(startValue, index - 1));
+      headers[key] = HeaderValue.parse(value);
+      index++;
+    }
+    return index;
+  }
+
   static MultiPartPart _parseMultipartPart(List<int> content) {
-    return MultiPartPart();
+    Map<String, HeaderValue> headers = {};
+    int endHeaders = _parseHeaders(content, headers);
+
+    return MultiPartPart(
+      content: content.sublist(endHeaders + 1, content.length - 1),
+      filename: headers['Content-Disposition']?.parameters['filename'],
+      contentType: headers['Content-Type']?.value,
+      contentDisposition: headers['Content-Disposition']?.value,
+      name: headers['Content-Disposition']?.parameters['name'],
+      isFile: headers['Content-Disposition']?.parameters['filename'] != null,
+    );
   }
 
   static List<MultiPartPart> parse(String boundary, List<int> content) {
