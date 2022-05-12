@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cobalt/core/backend_response.dart';
+import 'package:cobalt/network/multipart_parser.dart';
 
 enum ParamsType { query, body, params }
 
@@ -26,6 +27,10 @@ class PrivateBackendRequest extends BackendRequest {
   void setController(String controller) {
     _controller = controller;
   }
+
+  void setMultipartParts(List<MultiPartPart> parts) {
+    _multipartParts = parts;
+  }
 }
 
 class BackendRequest {
@@ -36,6 +41,7 @@ class BackendRequest {
   Map<String, String>? _params;
   final HttpRequest _request;
   late final BackendResponse _response;
+  List<MultiPartPart>? _multipartParts;
 
   BackendRequest(this._request) {
     _response = BackendResponse(_request.response);
@@ -65,8 +71,13 @@ class BackendRequest {
   /// The verb used to call the controller's action.
   String get method => _request.method;
 
+  /// Get the headers of the HTTP Request.
+  HttpHeaders get headers => _request.headers;
+
   /// Query parameters of the request
   Map<String, String> get queryParams => originalRequest.uri.queryParameters;
+
+  List<MultiPartPart>? get parts => _multipartParts;
 
   bool _shouldBeDefaulted(ParamsType type, String name) {
     switch (type) {
