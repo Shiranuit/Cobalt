@@ -5,7 +5,7 @@ class SecurityError extends BackendError {
     String errorCode,
     String message,
   ) : super(
-          statusCode: 502,
+          statusCode: 401,
           errorCode: errorCode,
           message: message,
           type: 'SecurityError',
