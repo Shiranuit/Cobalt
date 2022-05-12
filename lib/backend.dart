@@ -137,6 +137,7 @@ class Backend extends EventEmitter with ErrorManagerMixin, ServiceManagerMixin {
   }
 
   /// Register a new instance of a service
+  @override
   void registerService<T extends BackendServiceMixin>(T service) {
     if (_services.containsKey(T)) {
       throw Exception('Service already registered');
@@ -146,6 +147,7 @@ class Backend extends EventEmitter with ErrorManagerMixin, ServiceManagerMixin {
   }
 
   /// Access an instance of a service
+  @override
   T? getService<T extends BackendServiceMixin>() {
     BackendServiceMixin? service = _services[T];
     if (service == null) {

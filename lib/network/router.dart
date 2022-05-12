@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cobalt/backend.dart';
 import 'package:cobalt/backend_module.dart';
+import 'package:cobalt/network/multipart_parser.dart';
 import 'package:cobalt/network/router_part.dart';
 
 class Routes {
@@ -107,7 +109,21 @@ class Router extends BackendModule {
     }
 
     try {
-      if (part.getMetadata<NoInputParse>() == null) {
+      if (request.headers.contentType?.primaryType == 'multipart' &&
+          request.headers.contentType?.subType == 'form-data') {
+        String? boundary = request.headers.contentType?.parameters['boundary'];
+        if (boundary == null) {
+          throw Exception('Missing boundary in multipart/form-data');
+        }
+
+        List<int> data = [];
+        Completer<void> completer = Completer();
+        request.originalRequest.listen(data.addAll, onDone: () {
+          request.setMultipartParts(MultiPartParser.parse('--$boundary', data));
+          completer.complete();
+        });
+        await completer.future;
+      } else if (part.getMetadata<NoInputParse>() == null) {
         String body = await utf8.decodeStream(request.originalRequest);
         request.setBody(body);
       }
