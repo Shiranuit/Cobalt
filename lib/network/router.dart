@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:cobalt/backend.dart';
 import 'package:cobalt/backend_module.dart';
+import 'package:cobalt/errors/error_manager.dart';
 import 'package:cobalt/network/multipart_parser.dart';
 import 'package:cobalt/network/router_part.dart';
 
@@ -135,28 +136,7 @@ class Router extends BackendModule {
 
       await backend.pipe(AfterRequestProcessingEvent(request));
     } catch (error) {
-      if (error is BackendError) {
-        request.response.error = error;
-      } else if (error is Error) {
-        request.response.error = BackendError(
-          statusCode: 502,
-          message: error.toString(),
-          stackTrace: error.stackTrace,
-          type: 'InternalError',
-        );
-      } else if (error is Exception) {
-        request.response.error = BackendError(
-          statusCode: 502,
-          message: error.toString(),
-          type: 'InternalError',
-        );
-      } else if (error is String) {
-        request.response.error = BackendError(
-          statusCode: 502,
-          message: error.toString(),
-          type: 'InternalError',
-        );
-      }
+      request.response.error = ErrorManager.wrapError(error);
     }
   }
 }

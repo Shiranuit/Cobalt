@@ -59,7 +59,6 @@ class Entrypoint extends BackendModule {
     response.addStream(stream.stream.handleError((error) {
       print(error);
     }));
-    // response.close();
   }
 
   void sendResponse(BackendRequest request) {
