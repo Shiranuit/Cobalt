@@ -56,12 +56,25 @@ class Entrypoint extends BackendModule {
     response.headers.add('Transfer-Encoding', 'Chunked');
 
     stream.busy = true;
+    bool writeStarted = false;
     stream.stream.listen((List<int> data) {
       response.add(data);
+      writeStarted = true;
     }, onDone: () {
       response.close();
     }, onError: (error) {
-      print(error);
+      if (!writeStarted) {
+        response.headers.clear();
+        addDefaultHeaders(request, request.response);
+        response.headers.add('Content-Type', 'application/json');
+      }
+      BackendError? backendError = ErrorManager.wrapError(error);
+      if (backendError != null) {
+        response.write(jsonEncode(backendError.toJson()));
+      } else {
+        response.write(error.toString());
+      }
+      response.close();
     }, cancelOnError: true);
   }
 
