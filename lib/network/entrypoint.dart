@@ -70,12 +70,10 @@ class Entrypoint extends BackendModule {
       } else {
         print(error);
       }
-      BackendError? backendError = ErrorManager.wrapError(error);
-      if (backendError != null) {
-        response.write(jsonEncode(backendError.toJson()));
-      } else {
-        response.write(error.toString());
-      }
+
+      response.write(jsonEncode(
+        {'error': ErrorManager.wrapError(error).toJson()},
+      ));
       response.close();
     }, cancelOnError: true);
   }
