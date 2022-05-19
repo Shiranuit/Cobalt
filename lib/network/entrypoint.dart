@@ -67,6 +67,8 @@ class Entrypoint extends BackendModule {
         response.headers.clear();
         addDefaultHeaders(request, request.response);
         response.headers.add('Content-Type', 'application/json');
+      } else {
+        print(error);
       }
       BackendError? backendError = ErrorManager.wrapError(error);
       if (backendError != null) {
