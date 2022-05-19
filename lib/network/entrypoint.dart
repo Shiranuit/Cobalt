@@ -56,17 +56,13 @@ class Entrypoint extends BackendModule {
     response.headers.add('Transfer-Encoding', 'Chunked');
 
     stream.busy = true;
-    Stream<List<int>> _stream = stream.stream.handleError((error) {
+    stream.stream.listen((List<int> data) {
+      response.add(data);
+    }, onDone: () {
+      response.close();
+    }, onError: (error) {
       print(error);
     });
-    _stream.listen(
-      (List<int> data) {
-        response.add(data);
-      },
-      onDone: () {
-        response.close();
-      },
-    );
   }
 
   void sendResponse(BackendRequest request) {
