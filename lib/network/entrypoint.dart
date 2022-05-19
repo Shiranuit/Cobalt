@@ -39,7 +39,7 @@ class Entrypoint extends BackendModule {
 
     if (stream.busy) {
       response.headers.add('Content-Type', 'application/json');
-      response.write(jsonEncode({
+      response.write(backend.encode({
         'error': InternalError(null, 'Stream busy, cannot use it while busy')
             .toJson()
       }));
@@ -71,7 +71,7 @@ class Entrypoint extends BackendModule {
         print(error);
       }
 
-      response.write(jsonEncode(
+      response.write(backend.encode(
         {'error': ErrorManager.wrapError(error).toJson()},
       ));
       response.close();
@@ -85,7 +85,8 @@ class Entrypoint extends BackendModule {
 
     if (request.response.errored) {
       response.headers.add('Content-Type', 'application/json');
-      response.write(jsonEncode({'error': request.response.error!.toJson()}));
+      response
+          .write(backend.encode({'error': request.response.error!.toJson()}));
       response.close();
       return;
     }
@@ -96,9 +97,9 @@ class Entrypoint extends BackendModule {
     }
     String? json;
     try {
-      json = jsonEncode({'result': request.response.result});
+      json = backend.encode({'result': request.response.result});
     } catch (error) {
-      response.write(jsonEncode(
+      response.write(backend.encode(
         {'error': ErrorManager.wrapError(error).toJson()},
       ));
       response.close();

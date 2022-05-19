@@ -1,5 +1,6 @@
 import 'package:cobalt/annotations/backend_annotations.dart';
 import 'package:cobalt/core/service/backend_service.dart';
+import 'package:cobalt/utils/json_encoder.dart';
 
 import 'network/router_part.dart';
 import 'utils/reflect.dart';
@@ -18,11 +19,13 @@ export 'package:cobalt/core/backend_request.dart';
 export 'package:cobalt/event/event.dart';
 export 'package:cobalt/errors/errors.dart';
 
-class Backend extends EventEmitter with ErrorManagerMixin, ServiceManagerMixin {
+class Backend extends EventEmitter
+    with ErrorManagerMixin, ServiceManagerMixin, JsonEncoderMixin {
   late final Router _router;
   late final Entrypoint _entrypoint;
   final ErrorManager errorManager = ErrorManager();
   final Map<dynamic, BackendServiceMixin> _services = {};
+  final JsonEncoder jsonEncoder = JsonEncoder();
 
   Backend() {
     _router = Router(this);
@@ -154,5 +157,25 @@ class Backend extends EventEmitter with ErrorManagerMixin, ServiceManagerMixin {
       return null;
     }
     return service as T;
+  }
+
+  @override
+  void addSerializer<T>(JsonSerializer<T> serializer) {
+    jsonEncoder.addSerializer<T>(serializer);
+  }
+
+  @override
+  dynamic decode(String source) {
+    return jsonEncoder.decode(source);
+  }
+
+  @override
+  String encode(Object? object) {
+    return jsonEncoder.encode(object);
+  }
+
+  @override
+  void removeSerializer<T>() {
+    jsonEncoder.removeSerializer<T>();
   }
 }

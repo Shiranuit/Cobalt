@@ -35,8 +35,13 @@ class MathController with BackendControllerMixin {
   @Get()
   HttpStream download(BackendRequest request) {
     return HttpStream(
-      File('./bin/heatmap.png').openRead(),
+      File('./bin/heatap.png').openRead(),
       contentType: 'image/png',
     );
+  }
+
+  @Get()
+  void date(BackendRequest request) {
+    print(backend.decode(backend.encode({'date': DateTime.now()})));
   }
 }
