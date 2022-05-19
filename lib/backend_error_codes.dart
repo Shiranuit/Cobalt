@@ -1,4 +1,5 @@
 import 'package:cobalt/errors/error_manager.dart';
+import 'package:cobalt/errors/internal_error.dart';
 
 import 'errors/api_error.dart';
 

@@ -105,7 +105,7 @@ class Backend extends EventEmitter with ErrorManagerMixin, ServiceManagerMixin {
         List<String> path = [];
 
         path.add(controllerInfo?.path ?? controllerName.toLowerCase());
-        path.add(annotation.path ?? '');
+        path.add(annotation.path ?? MirrorSystem.getName(entry.key));
 
         final String buildedPath = path
             .map((e) {

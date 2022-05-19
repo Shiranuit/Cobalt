@@ -1,9 +1,5 @@
+import 'package:cobalt/backend.dart';
 import 'package:cobalt/errors/backend_error.dart';
-
-typedef ErrorConsturctor = BackendError Function({
-  required String errorCode,
-  required String message,
-});
 
 class ErrorBuilder {
   final String errorCode;
@@ -71,5 +67,31 @@ class ErrorManager with ErrorManagerMixin {
   @override
   void throwError(String errorCode, {List<String?>? args}) {
     throw getError(errorCode, args: args);
+  }
+
+  static BackendError? wrapError(dynamic error) {
+    if (error is BackendError) {
+      return error;
+    } else if (error is Error) {
+      return BackendError(
+        statusCode: 502,
+        message: error.toString(),
+        stackTrace: error.stackTrace,
+        type: 'InternalError',
+      );
+    } else if (error is Exception) {
+      return BackendError(
+        statusCode: 502,
+        message: error.toString(),
+        type: 'InternalError',
+      );
+    } else if (error is String) {
+      return BackendError(
+        statusCode: 502,
+        message: error.toString(),
+        type: 'InternalError',
+      );
+    }
+    return null;
   }
 }

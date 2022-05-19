@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:cobalt/backend.dart';
+import 'package:cobalt/network/http_stream.dart';
 import 'package:cobalt/network/multipart_parser.dart';
 
 import 'my_service.dart';
 
-@ControllerInfo()
+@ControllerInfo(path: '')
 class MathController with BackendControllerMixin {
   @Get(path: '/:first/:second')
   int add(BackendRequest request) {
@@ -14,8 +17,8 @@ class MathController with BackendControllerMixin {
   @Post()
   void failParse(BackendRequest request) {}
 
-  @Post(path: '/upload')
-  void test(BackendRequest request) {
+  @Post()
+  void upload(BackendRequest request) {
     if (request.parts != null) {
       for (MultiPartPart part in request.parts!) {
         print(part.name);
@@ -23,9 +26,17 @@ class MathController with BackendControllerMixin {
         print(part.filename);
         print(part.contentType);
         print(part.contentDisposition);
-        print(part.content);
+        print(part.contentAsString());
         print('-------');
       }
     }
+  }
+
+  @Get()
+  HttpStream download(BackendRequest request) {
+    return HttpStream(
+      File('./bin/heatmap.png').openRead(),
+      contentType: 'image/png',
+    );
   }
 }
