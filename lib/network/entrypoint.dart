@@ -96,8 +96,16 @@ class Entrypoint extends BackendModule {
       sendHttpStream(request, request.response.result as HttpStream);
       return;
     }
-
-    String json = jsonEncode({'result': request.response.result});
+    String? json;
+    try {
+      json = jsonEncode({'result': request.response.result});
+    } catch (error) {
+      response.write(jsonEncode(
+        {'error': ErrorManager.wrapError(error).toJson()},
+      ));
+      response.close();
+      return;
+    }
     response.write(json);
     response.close();
   }

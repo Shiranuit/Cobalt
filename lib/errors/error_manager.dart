@@ -69,7 +69,7 @@ class ErrorManager with ErrorManagerMixin {
     throw getError(errorCode, args: args);
   }
 
-  static BackendError? wrapError(dynamic error) {
+  static BackendError wrapError(dynamic error) {
     if (error is BackendError) {
       return error;
     } else if (error is Error) {
@@ -85,13 +85,11 @@ class ErrorManager with ErrorManagerMixin {
         message: error.toString(),
         type: 'InternalError',
       );
-    } else if (error is String) {
-      return BackendError(
-        statusCode: 502,
-        message: error.toString(),
-        type: 'InternalError',
-      );
     }
-    return null;
+    return BackendError(
+      statusCode: 502,
+      message: error.toString(),
+      type: 'InternalError',
+    );
   }
 }
