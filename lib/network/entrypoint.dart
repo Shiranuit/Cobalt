@@ -62,7 +62,7 @@ class Entrypoint extends BackendModule {
       response.close();
     }, onError: (error) {
       print(error);
-    });
+    }, cancelOnError: true);
   }
 
   void sendResponse(BackendRequest request) {
