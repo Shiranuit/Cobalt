@@ -97,8 +97,10 @@ class Entrypoint extends BackendModule {
     }
     String? json;
     try {
+      response.headers.add('Content-Type', 'application/json');
       json = backend.encode({'result': request.response.result});
     } catch (error) {
+      response.headers.add('Content-Type', 'application/json');
       response.write(backend.encode(
         {'error': ErrorManager.wrapError(error).toJson()},
       ));
