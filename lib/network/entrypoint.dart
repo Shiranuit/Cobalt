@@ -28,7 +28,7 @@ class Entrypoint extends BackendModule {
   void addDefaultHeaders(BackendRequest request, BackendResponse response) {
     response.addHeader('Access-Control-Allow-Origin', '*');
     response.addHeader(
-        'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     response.addHeader('Access-Control-Allow-Headers',
         'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     response.addHeader('Access-Control-Allow-Credentials', 'true');
