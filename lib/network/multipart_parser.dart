@@ -64,7 +64,7 @@ class MultiPartParser {
       }
       String value =
           String.fromCharCodes(content.sublist(startValue, index - 1));
-      headers[key] = HeaderValue.parse(value);
+      headers[key.toLowerCase()] = HeaderValue.parse(value);
       index++;
     }
     return index;
@@ -78,11 +78,11 @@ class MultiPartParser {
       content: Uint8List.fromList(
         content.sublist(endHeaders + 1, content.length - 1),
       ),
-      filename: headers['Content-Disposition']?.parameters['filename'],
-      contentType: headers['Content-Type']?.value,
-      contentDisposition: headers['Content-Disposition']?.value,
-      name: headers['Content-Disposition']?.parameters['name'],
-      isFile: headers['Content-Disposition']?.parameters['filename'] != null,
+      filename: headers['content-disposition']?.parameters['filename'],
+      contentType: headers['content-type']?.value,
+      contentDisposition: headers['content-disposition']?.value,
+      name: headers['content-disposition']?.parameters['name'],
+      isFile: headers['content-disposition']?.parameters['filename'] != null,
     );
   }
 
