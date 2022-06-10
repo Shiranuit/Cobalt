@@ -79,6 +79,20 @@ class BackendRequest {
 
   List<MultiPartPart>? get parts => _multipartParts;
 
+  MultiPartPart? getPartByName(String name) {
+    if (_multipartParts == null) {
+      return null;
+    }
+
+    for (MultiPartPart part in _multipartParts!) {
+      if (part.name == name) {
+        return part;
+      }
+    }
+
+    return null;
+  }
+
   bool _shouldBeDefaulted(ParamsType type, String name) {
     switch (type) {
       case ParamsType.query:
