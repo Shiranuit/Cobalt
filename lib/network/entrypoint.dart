@@ -28,7 +28,7 @@ class Entrypoint extends BackendModule {
   void addDefaultHeaders(BackendRequest request, BackendResponse response) {
     response.addHeader('Access-Control-Allow-Origin', '*');
     response.addHeader(
-        'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+        'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     response.addHeader('Access-Control-Allow-Headers',
         'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     response.addHeader('Access-Control-Allow-Credentials', 'true');
@@ -113,6 +113,13 @@ class Entrypoint extends BackendModule {
 
   void _onHTTPRequest(HttpRequest request) {
     PrivateBackendRequest _request = PrivateBackendRequest(request);
+
+    if (_request.method.toUpperCase() == 'OPTIONS') {
+      addDefaultHeaders(_request, _request.response);
+      _request.response.originalResponse.statusCode = 200;
+      _request.response.originalResponse.close();
+      return;
+    }
 
     Future(() async {
       await router.execute(_request);
