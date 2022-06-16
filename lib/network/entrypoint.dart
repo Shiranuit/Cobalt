@@ -32,6 +32,7 @@ class Entrypoint extends BackendModule {
     response.addHeader('Access-Control-Allow-Headers',
         'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     response.addHeader('Access-Control-Allow-Credentials', 'true');
+    response.addHeader('Connection', 'Close');
   }
 
   void sendHttpStream(BackendRequest request, HttpStream stream) {
@@ -52,8 +53,9 @@ class Entrypoint extends BackendModule {
     }
     if (stream.size != null) {
       response.headers.add('Content-Length', stream.size!);
+    } else {
+      response.headers.add('Transfer-Encoding', 'Chunked');
     }
-    response.headers.add('Transfer-Encoding', 'Chunked');
 
     stream.busy = true;
     bool writeStarted = false;
